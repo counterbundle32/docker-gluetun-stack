@@ -1,0 +1,89 @@
+version: "3.8"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: mullvad_gluetun_container
+    network_mode: bridge
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports: #make sure to include these for qbittorrent to work
+      - 6081:6881
+      - 6081:6881/udp
+      - 6011:6011
+      - 6012:6012
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=IHo3X+RSIMd3mW0n6r7JcoKWb0wamE44peFrjj7ONVM= #Daring Insect
+      - WIREGUARD_ADDRESSES=10.65.138.23/32
+      - SERVER_CITIES=Secaucus NJ #choose any available city
+    volumes:
+      #- gluetun:/var/lib/docker/volumes/gluetun
+      - /var/lib/docker/volumes/gluetun:/gluetun
+    restart: unless-stopped
+  chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: chromium
+    depends_on:
+      - gluetun
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CHROME_CLI=https://www.linuxserver.io/ #optional
+      - WEBUI_PORT=6012
+    volumes:
+      - /home/atort88/docker/appdata/chromium:/config
+    network_mode: "container:mullvad_gluetun_container"        
+    #ports:
+      #- "192.168.0.208:3000:3000"
+      #- "192.168.0.208:3001:3001"
+    shm_size: "1gb"
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=6011
+    volumes:
+      #- D:\ActiveTorrents\config:/config
+      #- D:\ActiveTorrents\downloads:/downloads
+      #- D:\ActiveTorrents\downloads\incomplete:/downloads/incomplete
+      - /home/atort88/qbittorrent/config:/config
+      - /home/atort88/qbittorrent/downloads:/downloads
+      - /home/atort88/qbittorrent/downloads/incomplete:/downloads/incomplete
+      ## Future Workflow ### This required atort88:media onwership at a minimum to perform  
+      #- /media/plexA/seeders_tv:/downloads/tv
+      #- /media/plexA/TV:/plex/tv
+      #- /media/plexB/Films/seeders_films:/downloads/films
+      - /media/plex_nas/seeders_tv/:/downloads/tv_nas
+      - /media/plex_nas/seeders_films/:/downloads/films_nas
+      - /media/plex_nas/seeders_books/:/downloads/books_nas
+      - /media/plex_nas/seeders_prn/:/downloads/prn_nas
+      ## Previous Workflow
+      #- /home/atort88/qbittorrent/downloads/films:/downloads/films
+      #- /home/atort88/qbittorrent/downloads/tv:/downloads/tv
+      - /home/atort88/qbittorrent/downloads/books:/downloads/books
+    network_mode: "container:mullvad_gluetun_container" #change gluetun to your VPN container name   
+    #network_mode: "service:Mullvad" #change gluetun to your VPN service name  
+    # ports: #you wont need the ports in this configuration file, you will need to include them in the Gluetun container
+    #   - 6081:6881
+    #   - 6081:6881/udp
+    #   - 6011:6011  
+    restart: unless-stopped
+  
+  restarter:    
+    image: docker:cli
+    container_name: restarter
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    command: ["/bin/sh", "-c", "while true; do sleep 43200; docker restart qbittorrent; done"]
+    restart: unless-stopped
