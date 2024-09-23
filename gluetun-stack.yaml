@@ -11,6 +11,7 @@ services:
     ports: #make sure to include these for qbittorrent to work
       - 6081:6881
       - 6081:6881/udp
+      - 8888:8888/tcp
       - 6011:6011
       - 3000:3000
       - 3001:3001
@@ -21,6 +22,7 @@ services:
       - WIREGUARD_ADDRESSES=10.65.138.23/32
       - SERVER_CITIES=Secaucus NJ #choose any available city
       - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+
     volumes:
       #- gluetun:/var/lib/docker/volumes/gluetun
       - /var/lib/docker/volumes/gluetun:/gluetun
@@ -40,7 +42,7 @@ services:
       - WEBUI_PORT="192.168.0.208:3000:3000"
     volumes:
       - /home/atort88/docker/appdata/chromium:/config
-    network_mode: "container:mullvad_gluetun_container"        
+    network_mode: "container:mullvad_gluetun_container"
     #ports:
       #- "192.168.0.208:3000:3000"
       #- "192.168.0.208:3001:3001"
@@ -85,6 +87,8 @@ services:
   restarter:    
     image: docker:cli
     container_name: restarter
+    depends_on:
+      - qbittorrent
     volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
     command: ["/bin/sh", "-c", "while true; do sleep 43200; docker restart qbittorrent; done"]
     restart: unless-stopped
