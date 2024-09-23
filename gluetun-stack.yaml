@@ -42,6 +42,7 @@ services:
       - WEBUI_PORT="192.168.0.208:3000:3000"
     volumes:
       - /home/atort88/docker/appdata/chromium:/config
+      - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
     network_mode: "container:mullvad_gluetun_container"
     #ports:
       #- "192.168.0.208:3000:3000"
