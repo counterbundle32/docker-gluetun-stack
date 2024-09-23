@@ -12,7 +12,8 @@ services:
       - 6081:6881
       - 6081:6881/udp
       - 6011:6011
-      - 6012:6012
+      - 3000:3000
+      - 3001:3001
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
@@ -35,7 +36,7 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - CHROME_CLI=https://www.linuxserver.io/ #optional
-      - WEBUI_PORT=6012
+      - WEBUI_PORT=3000
     volumes:
       - /home/atort88/docker/appdata/chromium:/config
     network_mode: "container:mullvad_gluetun_container"        
