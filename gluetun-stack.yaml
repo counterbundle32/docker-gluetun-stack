@@ -20,7 +20,7 @@ services:
       - WIREGUARD_PRIVATE_KEY=IHo3X+RSIMd3mW0n6r7JcoKWb0wamE44peFrjj7ONVM= #Daring Insect
       - WIREGUARD_ADDRESSES=10.65.138.23/32
       - SERVER_CITIES=Secaucus NJ #choose any available city
-      - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
     volumes:
       #- gluetun:/var/lib/docker/volumes/gluetun
       - /var/lib/docker/volumes/gluetun:/gluetun
