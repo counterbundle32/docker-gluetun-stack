@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: chromium
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CHROME_CLI=https://www.linuxserver.io/ #optional
+      - WEBUI_PORT=3000
+    volumes:
+      - /home/atort88/docker/appdata/chromium:/config
+      - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
+    ports:
+      - 3000:3000
+      - 3001:3001
+
+    network_mode: "host"
+    shm_size: "1gb"
