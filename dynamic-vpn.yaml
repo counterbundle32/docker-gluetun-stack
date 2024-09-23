@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: mullvad_gluetun_container_dynamic_metube   
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "8081:8081"
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=6CtAHoMgnWv9ABC2pfxlr79hklgZqi1DI7wp7j5CbVg= #Civil Sheep
+      - WIREGUARD_ADDRESSES=10.68.141.101/32
+      #USA
+      #- SERVER_CITIES=Ashburn VA
+      #- SERVER_CITIES=Atlanta GA
+      #- SERVER_CITIES=Chicago IL
+      #- SERVER_CITIES=Dallas TX
+      #- SERVER_CITIES=Denver CO
+     # - SERVER_CITIES=Houston TX
+     # - SERVER_CITIES=Los Angeles CA
+     # - SERVER_CITIES=Miami FL
+      #- SERVER_CITIES=New York NY
+      #- SERVER_CITIES=Phoenix AZ
+      #- SERVER_CITIES=Raleigh NC
+      #- SERVER_CITIES=Salt Lake City UT
+      #- SERVER_CITIES=San Jose CA
+      #- SERVER_CITIES=Seattle WA
+      #- SERVER_CITIES=Secaucus NJ
+
+      #AUS
+      - SERVER_CITIES=Adelaide
+      #- SERVER_CITIES=Brisbane
+      #- SERVER_CITIES=Melbourne
+      
+      #CA
+      #- SERVER_CITIES=Calgary
+      #- SERVER_CITIES=Montreal
+      #- SERVER_CITIES=Toronto
+      #- SERVER_CITIES=Vancouver
+      #ESP
+      #- SERVER_CITIES=Madrid
+      #FRA
+      #- SERVER_CITIES=Marseille
+      #- SERVER_CITIES=Paris
+      #IRE
+      #- SERVER_CITIES=Dublin
+      #NZ
+      #- SERVER_CITIES=Auckland
+       #UK
+      #- SERVER_CITIES=London
+      #- SERVER_CITIES=Manchester
+    volumes:
+      - gluetun:/var/lib/docker/volumes/GluetunDynamic
+    restart: unless-stopped
+volumes:
+  gluetun:
+
