@@ -8,7 +8,7 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun:/dev/net/tun
-    ports: #make sure to include these for qbittorrent to work
+    ports: #make sure to include these from other apps to work #https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md
       - 6081:6881
       - 6081:6881/udp
       - 8888:8888/tcp
