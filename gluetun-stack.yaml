@@ -12,9 +12,10 @@ services:
       - 6081:6881
       - 6081:6881/udp
       - 8888:8888/tcp
-      - 6011:6011
-      - 3000:3000
-      - 3001:3001
+      - 6011:6011 #qbittorrent
+      - 3000:3000 #chromium
+      - 3001:3001 #chromium
+      - 3081:8081 #MeTube
     environment:
       - VPN_SERVICE_PROVIDER=mullvad
       - VPN_TYPE=wireguard
