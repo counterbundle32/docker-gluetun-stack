@@ -28,8 +28,8 @@ services:
       - /var/lib/docker/volumes/gluetun:/gluetun
     restart: unless-stopped 
   neko:
-    image: "m1k1o/neko:firefox"
-    #image: "m1k1o/neko:chromium" #for Chromium needs --cap-add=SYS_ADMIN
+    #image: "m1k1o/neko:firefox"
+    image: "m1k1o/neko:chromium" #for Chromium needs --cap-add=SYS_ADMIN
     #image: "m1k1o/neko:brave" #for Brave Browser needs --cap-add=SYS_ADMIN
     # Need to see what Nividia GPU HW Acceraltion would benefit
     #ghcr.io/m1k1o/neko/nvidia-chromium:latest #GHCR images are built using GitHub actions for every tag.
@@ -42,6 +42,9 @@ services:
       #- "8080:8080"
       #- "52000-52100:52000-52100/udp"
     network_mode: "container:mullvad_gluetun_container"
+    #required for chromium
+    cap_add:
+      - SYS_ADMIN
     environment:
       NEKO_SCREEN: 1920x1080@30
       NEKO_PASSWORD: neko
