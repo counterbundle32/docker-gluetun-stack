@@ -1,0 +1,69 @@
+#https://neko.m1k1o.net/#/getting-started/
+
+version: "3.4"
+services:
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: mullvad_gluetun_container
+    network_mode: bridge
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports: #make sure to include these from other apps to work #https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md
+      - 6081:6881
+      - 6081:6881/udp
+      - 8888:8888/tcp
+      - "8080:8080"
+      - "52000-52100:52000-52100/udp"
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=IHo3X+RSIMd3mW0n6r7JcoKWb0wamE44peFrjj7ONVM= #Daring Insect
+      - WIREGUARD_ADDRESSES=10.65.138.23/32
+      - SERVER_CITIES=Secaucus NJ #choose any available city
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+    volumes:
+      #- gluetun:/var/lib/docker/volumes/gluetun
+      - /var/lib/docker/volumes/gluetun:/gluetun
+    restart: unless-stopped 
+  neko:
+    image: "m1k1o/neko:firefox"
+    #image: "m1k1o/neko:chromium" #for Chromium needs --cap-add=SYS_ADMIN
+    #image: "m1k1o/neko:brave" #for Brave Browser needs --cap-add=SYS_ADMIN
+    # Need to see what Nividia GPU HW Acceraltion would benefit
+    #ghcr.io/m1k1o/neko/nvidia-chromium:latest #GHCR images are built using GitHub actions for every tag.
+    container_name: niko_firefox
+    depends_on:
+      - gluetun 
+    restart: "unless-stopped"
+    shm_size: "2gb"
+    #ports:
+      #- "8080:8080"
+      #- "52000-52100:52000-52100/udp"
+    network_mode: "container:mullvad_gluetun_container"
+    environment:
+      NEKO_SCREEN: 1920x1080@30
+      NEKO_PASSWORD: neko
+      NEKO_PASSWORD_ADMIN: admin
+      NEKO_EPR: 52000-52100
+      NEKO_ICESERVERS: '[{ "urls": [ "turn:192.168.0.208:3478" ], "username":"neko", "credential":"neko" }, { "urls": [ "stun:stun.nextcloud.com:3478" ] }]'
+  coturn:
+    image: 'coturn/coturn:latest'
+    container_name: niko_coturn
+    depends_on:
+      - gluetun 
+    network_mode: "host"
+    # updated with Homelab port
+    command: |
+      -n
+      --realm=localhost
+      --fingerprint
+      --listening-ip=0.0.0.0
+      --external-ip=192.168.0.208 
+      --listening-port=3478
+      --min-port=49160
+      --max-port=49200
+      --log-file=stdout
+      --user=neko:neko
+      --lt-cred-mech
