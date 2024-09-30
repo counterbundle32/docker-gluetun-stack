@@ -92,14 +92,15 @@ services:
     image: ghcr.io/alexta69/metube
     container_name: metube
     environment:
-      - TEMP_DIR=/home/atort88/docker/appdata/MeTube/temp
-      - WEBUI_PORT=3081
+      - TEMP_DIR=/temp
+      - WEBUI_PORT="3081:8081"
     #ports:
       #- 3081:8081
     network_mode: "container:mullvad_gluetun_container"
     volumes:
       - metube:/var/lib/docker/volumes/metube
-      - /home/atort88/docker/appdata/MeTube:/downloads  
+      - /home/atort88/docker/appdata/MeTube:/downloads
+      - /home/atort88/docker/appdata/MeTube/temp:/temp
     restart: unless-stopped
   
   restarter:    
