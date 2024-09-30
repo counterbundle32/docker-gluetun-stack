@@ -95,6 +95,7 @@ services:
       - gluetun
     environment:
       - TEMP_DIR=/temp
+      - STATE_DIR=/queue
       - WEBUI_PORT="3081:8081"
     #ports:
       #- 3081:8081
@@ -104,8 +105,9 @@ services:
       #- /home/atort88/docker/appdata/MeTube:/downloads
       - /media/plex_nas/metube:/downloads
       - /home/atort88/docker/appdata/MeTube/temp:/temp
+      - /home/atort88/docker/appdata/MeTube/.metube:/queue
     restart: unless-stopped
-  
+######## qbittorrent restarter########
   restarter:    
     image: docker:cli
     container_name: restarter
