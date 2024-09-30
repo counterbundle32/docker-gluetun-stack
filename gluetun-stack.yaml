@@ -91,6 +91,8 @@ services:
   metube:
     image: ghcr.io/alexta69/metube
     container_name: metube
+    depends_on:
+      - gluetun
     environment:
       - TEMP_DIR=/temp
       - WEBUI_PORT="3081:8081"
