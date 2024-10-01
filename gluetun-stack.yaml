@@ -62,6 +62,8 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - WEBUI_PORT=6011
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #https://github.com/VueTorrent/VueTorrent/wiki/Installation
+      - DOCKER_MODS=marzzzello/linuxserver-io-mod-qbit-matui #https://github.com/marzzzello/linuxserver-io-mod-qbit-matui
     volumes:
       #- D:\ActiveTorrents\config:/config
       #- D:\ActiveTorrents\downloads:/downloads
