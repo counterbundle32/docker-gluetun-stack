@@ -22,8 +22,8 @@ services:
       - VPN_TYPE=wireguard
       - WIREGUARD_PRIVATE_KEY=IHo3X+RSIMd3mW0n6r7JcoKWb0wamE44peFrjj7ONVM= #Daring Insect
       - WIREGUARD_ADDRESSES=10.65.138.23/32
-      - SERVER_CITIES=Secaucus NJ #choose any available city
-      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+      - SERVER_CITIES=New York NY #Secaucus NJ #choose any available city
+      #- FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
 
     volumes:
       #- gluetun:/var/lib/docker/volumes/gluetun
@@ -42,7 +42,8 @@ services:
       - PGID=1000
       - TZ=Etc/UTC
       - CHROME_CLI=https://whatismyipaddress.com/ #optional
-      - WEBUI_PORT="192.168.0.208:3000:3000"
+      - WEBUI_PORT="192.168.0.208:3001:3001"
+      - NO_DECOR=true
     volumes:
       - /home/atort88/docker/appdata/chromium:/config
       - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
@@ -54,7 +55,8 @@ services:
     restart: unless-stopped
 ######## qbittorrent ########
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    #image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:4.6.7-r0-ls353
     container_name: qbittorrent
     depends_on:
       - gluetun
@@ -63,8 +65,7 @@ services:
       - PGID=1000
       - TZ=America/New_York
       - WEBUI_PORT=6011
-      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #https://github.com/VueTorrent/VueTorrent/wiki/Installation
-      - DOCKER_MODS=marzzzello/linuxserver-io-mod-qbit-matui #https://github.com/marzzzello/linuxserver-io-mod-qbit-matui
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #/vuetorrent #https://github.com/VueTorrent/VueTorrent/wiki/Installation
     volumes:
       #- D:\ActiveTorrents\config:/config
       #- D:\ActiveTorrents\downloads:/downloads
@@ -110,7 +111,8 @@ services:
       - /home/atort88/docker/appdata/MeTube/temp:/temp
       - /home/atort88/docker/appdata/MeTube/.metube:/queue
     restart: unless-stopped
-######## qbittorrent restarter########
+
+########## restarter ##########  
   restarter:    
     image: docker:cli
     container_name: restarter
