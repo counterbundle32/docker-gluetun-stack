@@ -29,6 +29,15 @@ services:
       #- gluetun:/var/lib/docker/volumes/gluetun
       - /var/lib/docker/volumes/gluetun:/gluetun
     restart: unless-stopped
+######## vpntest ########  
+  vpntest:
+    image: byrnedo/alpine-curl
+    container_name: vpntest
+    command: -L 'https://ipinfo.io'
+    depends_on: 
+        - gluetun
+    network_mode: "container:mullvad_gluetun_container"
+    restart: always
 ######## chromium ########
   chromium:
     image: lscr.io/linuxserver/chromium:latest
@@ -67,24 +76,21 @@ services:
       - WEBUI_PORT=6011
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #/vuetorrent #https://github.com/VueTorrent/VueTorrent/wiki/Installation
     volumes:
-      #- D:\ActiveTorrents\config:/config
-      #- D:\ActiveTorrents\downloads:/downloads
-      #- D:\ActiveTorrents\downloads\incomplete:/downloads/incomplete
       - /home/atort88/qbittorrent/config:/config
       - /home/atort88/qbittorrent/downloads:/downloads
+      - /home/atort88/qbittorrent/downloads/unlimitedshare:/downloads/unlimitedshare
       - /home/atort88/qbittorrent/downloads/incomplete:/downloads/incomplete
-      ## Future Workflow ### This required atort88:media onwership at a minimum to perform  
-      #- /media/plexA/seeders_tv:/downloads/tv
-      #- /media/plexA/TV:/plex/tv
-      #- /media/plexB/Films/seeders_films:/downloads/films
       - /media/plex_nas/seeders_tv/:/downloads/tv_nas
       - /media/plex_nas/seeders_films/:/downloads/films_nas
       - /media/plex_nas/seeders_books/:/downloads/books_nas
       - /media/plex_nas/seeders_prn/:/downloads/prn_nas
+      - /home/atort88/qbittorrent/downloads/books:/downloads/books
       ## Previous Workflow
       #- /home/atort88/qbittorrent/downloads/films:/downloads/films
       #- /home/atort88/qbittorrent/downloads/tv:/downloads/tv
-      - /home/atort88/qbittorrent/downloads/books:/downloads/books
+      #- /media/plexA/seeders_tv:/downloads/tv
+      #- /media/plexA/TV:/plex/tv
+      #- /media/plexB/Films/seeders_films:/downloads/films      
     network_mode: "container:mullvad_gluetun_container" #change gluetun to your VPN container name   
     # ports: #you wont need the ports in this configuration file, you will need to include them in the Gluetun container
     #   - 6081:6881
