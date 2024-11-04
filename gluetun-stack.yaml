@@ -76,21 +76,28 @@ services:
       - WEBUI_PORT=6011
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #/vuetorrent #https://github.com/VueTorrent/VueTorrent/wiki/Installation
     volumes:
+      #- D:\ActiveTorrents\config:/config
+      #- D:\ActiveTorrents\downloads:/downloads
+      #- D:\ActiveTorrents\downloads\incomplete:/downloads/incomplete
       - /home/atort88/qbittorrent/config:/config
       - /home/atort88/qbittorrent/downloads:/downloads
       - /home/atort88/qbittorrent/downloads/unlimitedshare:/downloads/unlimitedshare
       - /home/atort88/qbittorrent/downloads/incomplete:/downloads/incomplete
-      - /media/plex_nas/seeders_tv/:/downloads/tv_nas
-      - /media/plex_nas/seeders_films/:/downloads/films_nas
-      - /media/plex_nas/seeders_books/:/downloads/books_nas
-      - /media/plex_nas/seeders_prn/:/downloads/prn_nas
-      - /home/atort88/qbittorrent/downloads/books:/downloads/books
+      - /media/plex_nas/browserdownloads/films:/torrents/films
+      - /media/plex_nas/browserdownloads/tvseries:/torrents/tvseries
+      - /media/plex_nas/browserdownloads/other:/torrents/other
+      ## Future Workflow ### This required atort88:media onwership at a minimum to perform  
+      #- /media/plexA/seeders_tv:/downloads/tv
+      #- /media/plexA/TV:/plex/tv
+      #- /media/plexB/Films/seeders_films:/downloads/films
+      - /media/plex_nas/seeders_tv:/downloads/tv_nas
+      - /media/plex_nas/seeders_films:/downloads/films_nas
+      - /media/plex_nas/seeders_books:/downloads/books_nas
+      - /media/plex_nas/seeders_prn:/downloads/prn_nas
       ## Previous Workflow
       #- /home/atort88/qbittorrent/downloads/films:/downloads/films
       #- /home/atort88/qbittorrent/downloads/tv:/downloads/tv
-      #- /media/plexA/seeders_tv:/downloads/tv
-      #- /media/plexA/TV:/plex/tv
-      #- /media/plexB/Films/seeders_films:/downloads/films      
+      - /home/atort88/qbittorrent/downloads/books:/downloads/books
     network_mode: "container:mullvad_gluetun_container" #change gluetun to your VPN container name   
     # ports: #you wont need the ports in this configuration file, you will need to include them in the Gluetun container
     #   - 6081:6881
