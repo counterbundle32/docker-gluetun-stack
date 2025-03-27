@@ -1,4 +1,4 @@
-
+## gluetun-stack
 services:
 ######## gluetun ########
   gluetun:
@@ -41,6 +41,7 @@ services:
 ######## chromium ########
   chromium:
     image: lscr.io/linuxserver/chromium:latest
+    #image: lscr.io/linuxserver/chromium:6c8c2571-ls109
     container_name: chromium
     depends_on:
       - gluetun
@@ -114,6 +115,7 @@ services:
       - TEMP_DIR=/temp
       - STATE_DIR=/queue
       - WEBUI_PORT="3081:8081"
+      - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
     #ports:
       #- 3081:8081
     network_mode: "container:mullvad_gluetun_container"
@@ -121,6 +123,7 @@ services:
       - metube:/var/lib/docker/volumes/metube
       #- /home/atort88/docker/appdata/MeTube:/downloads
       - /media/plex_nas/metube:/downloads
+      - /media/plex_nas/metube/cookies:/cookies
       - /home/atort88/docker/appdata/MeTube/temp:/temp
       - /home/atort88/docker/appdata/MeTube/.metube:/queue
     restart: unless-stopped
