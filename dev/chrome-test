@@ -1,0 +1,20 @@
+## chrome-test
+services:
+  chrome-test:
+    image: lscr.io/linuxserver/chrome:latest
+    container_name: chrome-test
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CHROME_CLI=https://www.linuxserver.io/ #optional
+    volumes:
+      - /home/atort88/docker/appdata/chrome-test:/config
+      - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
+    ports:
+      - "192.168.0.208:3044:3000"
+    #  - 3001:3001
+    shm_size: "1gb"
+    restart: unless-stopped
