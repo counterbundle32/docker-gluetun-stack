@@ -1,0 +1,145 @@
+## gluetun-stack
+services:
+######## gluetun ########
+  gluetun:
+    image: qmcgaw/gluetun
+    container_name: mullvad_gluetun_container
+    network_mode: bridge
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports: #make sure to include these from other apps to work #https://github.com/qdm12/gluetun-wiki/blob/main/setup/connect-a-container-to-gluetun.md
+      - 6081:6881
+      - 6081:6881/udp
+      - 8888:8888/tcp
+      - 6011:6011 #qbittorrent
+      - 3000:3000 #chrome
+      - "192.168.0.208:3001:3001" #chrome
+      - 3081:8081 #MeTube
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=IHo3X+RSIMd3mW0n6r7JcoKWb0wamE44peFrjj7ONVM= #Daring Insect
+      - WIREGUARD_ADDRESSES=10.65.138.23/32
+      - SERVER_CITIES=New York NY #Secaucus NJ #choose any available city
+      - FIREWALL_OUTBOUND_SUBNETS=192.168.0.0/24
+
+    volumes:
+      #- gluetun:/var/lib/docker/volumes/gluetun
+      - /var/lib/docker/volumes/gluetun:/gluetun
+    restart: unless-stopped
+######## vpntest ########  
+  vpntest:
+    image: byrnedo/alpine-curl
+    container_name: vpntest
+    command: -L 'https://ipinfo.io'
+    depends_on: 
+        - gluetun
+    network_mode: "container:mullvad_gluetun_container"
+    restart: always
+######## chromium ########
+  #chromium:
+  chrome:
+    #image: lscr.io/linuxserver/chromium:latest
+    #image: lscr.io/linuxserver/chromium:6c8c2571-ls109
+    image: lscr.io/linuxserver/chrome:latest
+    container_name: chrome
+    depends_on:
+      - gluetun
+    security_opt:
+      - seccomp:unconfined #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - CHROME_CLI=https://whatismyipaddress.com/ #optional
+      #- WEBUI_PORT="https://192.168.0.208:3001:3001"
+      #https://192.168.0.208:3001/
+      - NO_DECOR=true
+    volumes:
+      - /home/atort88/docker/appdata/chrome:/config
+      - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
+    network_mode: "container:mullvad_gluetun_container"
+    #ports:
+      #- "192.168.0.208:3000:3000"
+      #- "192.168.0.208:3001:3001"
+    shm_size: "1gb"
+    restart: unless-stopped
+######## qbittorrent ########
+  qbittorrent:
+    #image: lscr.io/linuxserver/qbittorrent:latest
+    image: lscr.io/linuxserver/qbittorrent:4.6.7-r0-ls353
+    container_name: qbittorrent
+    depends_on:
+      - gluetun
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=6011
+      - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest #/vuetorrent #https://github.com/VueTorrent/VueTorrent/wiki/Installation
+    volumes:
+      #- D:\ActiveTorrents\config:/config
+      #- D:\ActiveTorrents\downloads:/downloads
+      #- D:\ActiveTorrents\downloads\incomplete:/downloads/incomplete
+      - /home/atort88/qbittorrent/config:/config
+      - /home/atort88/qbittorrent/downloads:/downloads
+      - /home/atort88/qbittorrent/downloads/unlimitedshare:/downloads/unlimitedshare
+      - /home/atort88/qbittorrent/downloads/incomplete:/downloads/incomplete
+      - /media/plex_nas/browserdownloads/films:/torrents/films
+      - /media/plex_nas/browserdownloads/tvseries:/torrents/tvseries
+      - /media/plex_nas/browserdownloads/other:/torrents/other
+      ## Future Workflow ### This required atort88:media onwership at a minimum to perform  
+      #- /media/plexA/seeders_tv:/downloads/tv
+      #- /media/plexA/TV:/plex/tv
+      #- /media/plexB/Films/seeders_films:/downloads/films
+      - /media/plex_nas/seeders_tv:/downloads/tv_nas
+      - /media/plex_nas/seeders_films:/downloads/films_nas
+      - /media/plex_nas/seeders_books:/downloads/books_nas
+      - /media/plex_nas/seeders_prn:/downloads/prn_nas
+      ## Previous Workflow
+      #- /home/atort88/qbittorrent/downloads/films:/downloads/films
+      #- /home/atort88/qbittorrent/downloads/tv:/downloads/tv
+      - /home/atort88/qbittorrent/downloads/books:/downloads/books
+    network_mode: "container:mullvad_gluetun_container" #change gluetun to your VPN container name   
+    # ports: #you wont need the ports in this configuration file, you will need to include them in the Gluetun container
+    #   - 6081:6881
+    #   - 6081:6881/udp
+    #   - 6011:6011  
+    restart: unless-stopped
+  ######## MeTube ########
+  metube:
+    image: ghcr.io/alexta69/metube
+    container_name: metube
+    depends_on:
+      - gluetun
+    environment:
+      - TEMP_DIR=/temp
+      - STATE_DIR=/queue
+      - WEBUI_PORT="3081:8081"
+      - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
+    #ports:
+      #- 3081:8081
+    network_mode: "container:mullvad_gluetun_container"
+    volumes:
+      - metube:/var/lib/docker/volumes/metube
+      #- /home/atort88/docker/appdata/MeTube:/downloads
+      - /media/plex_nas/metube:/downloads
+      - /media/plex_nas/metube/cookies:/cookies
+      - /home/atort88/docker/appdata/MeTube/temp:/temp
+      - /home/atort88/docker/appdata/MeTube/.metube:/queue
+    restart: unless-stopped
+
+########## restarter ##########  
+  restarter:    
+    image: docker:cli
+    container_name: restarter
+    depends_on:
+      - qbittorrent
+    volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+    command: ["/bin/sh", "-c", "while true; do sleep 43200; docker restart qbittorrent; done"]
+    restart: unless-stopped
+######
+volumes:
+  metube:
