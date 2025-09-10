@@ -15,6 +15,6 @@ services:
       - "/media/plex_nas/browserdownloads:/config/Downloads:rw"
     ports:
       - "192.168.0.208:3044:3000"
-    #  - 3001:3001
+      - "192.168.0.208:3041:3001"
     shm_size: "1gb"
     restart: unless-stopped
